@@ -1,0 +1,18 @@
+[project]
+name = "policygpt"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "faiss-cpu>=1.13.2",
+    "fastapi>=0.136.1",
+    "langchain>=1.2.15",
+    "langchain-community>=0.4.1",
+    "langchain-openai>=1.2.1",
+    "langchain-text-splitters>=1.1.2",
+    "pypdf>=6.10.2",
+    "python-dotenv>=1.2.2",
+    "sentence-transformers>=5.4.1",
+    "uvicorn>=0.46.0",
+]
