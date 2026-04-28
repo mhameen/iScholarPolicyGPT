@@ -17,9 +17,9 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 # Create embeddings (same as before)
-embeddings = HuggingFaceEmbeddings(
-    model_name="all-MiniLM-L6-v2"
-)
+from langchain_openai import OpenAIEmbeddings
+
+embeddings = OpenAIEmbeddings()
 
 # Load FAISS
 vectorstore = FAISS.load_local(
