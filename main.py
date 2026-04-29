@@ -1,66 +1,60 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import traceback
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 app = FastAPI()
 
-# ---- GLOBAL VARIABLE ----
-qa_chain = None
+qa_chain = None  # global
 
-# ---- REQUEST MODEL ----
 class QueryRequest(BaseModel):
     query: str
 
-# ---- HEALTH CHECK (VERY IMPORTANT) ----
+# ✅ Health check
 @app.get("/")
 def home():
     return {"status": "running"}
 
-# ---- LOAD RAG AFTER SERVER STARTS ----
-@app.on_event("startup")
-def load_rag():
+# ✅ Lazy load function
+def get_qa_chain():
     global qa_chain
 
-    print("Loading RAG...")
+    if qa_chain is None:
+        print("Loading RAG...")
 
-    from langchain_openai import OpenAIEmbeddings, ChatOpenAI
-    from langchain_community.vectorstores import FAISS
-    from langchain_classic.chains import RetrievalQA
+        from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+        from langchain_community.vectorstores import FAISS
+        from langchain_classic.chains import RetrievalQA
 
-    embeddings = OpenAIEmbeddings()
+        embeddings = OpenAIEmbeddings()
 
-    vectorstore = FAISS.load_local(
-        "faiss_index",
-        embeddings,
-        allow_dangerous_deserialization=True
-    )
+        vectorstore = FAISS.load_local(
+            "faiss_index",
+            embeddings,
+            allow_dangerous_deserialization=True
+        )
 
-    llm = ChatOpenAI(model="gpt-4o-mini")
+        llm = ChatOpenAI(model="gpt-4o-mini")
 
-    qa_chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        retriever=vectorstore.as_retriever(),
-        return_source_documents=True
-    )
+        qa_chain = RetrievalQA.from_chain_type(
+            llm=llm,
+            retriever=vectorstore.as_retriever(),
+            return_source_documents=True
+        )
 
-    print("RAG Loaded Successfully!")
+        print("RAG Loaded ✅")
 
-# ---- API ENDPOINT ----
+    return qa_chain
+
+
+# ✅ API endpoint
 @app.post("/ask")
 def ask_question(req: QueryRequest):
     try:
-        if qa_chain is None:
-            return {"error": "Model is still loading. Try again in a few seconds."}
+        chain = get_qa_chain()
 
-        response = qa_chain.invoke({"query": req.query})
+        response = chain.invoke({"query": req.query})
 
-        return {
-            "answer": response["result"]
-        }
+        return {"answer": response["result"]}
 
     except Exception as e:
         return {
