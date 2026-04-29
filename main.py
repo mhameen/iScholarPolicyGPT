@@ -48,6 +48,11 @@ qa_chain = RetrievalQA.from_chain_type(
 )
 
 # ---- API ENDPOINT ----
+
+@app.get("/")
+def home():
+    return {"message": "PolicyGPT API is running 🚀"}
+
 @app.post("/ask")
 def ask_question(req: QueryRequest):
     try:
