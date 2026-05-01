@@ -2,6 +2,10 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import traceback
 from dotenv import load_dotenv
+import os
+
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 load_dotenv()
 
@@ -30,7 +34,7 @@ def get_qa_chain():
         from langchain_community.vectorstores import FAISS
         from langchain_classic.chains import RetrievalQA
 
-        embeddings = OpenAIEmbeddings()
+        embeddings = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
 
         vectorstore = FAISS.load_local(
             "faiss_index",
@@ -38,7 +42,10 @@ def get_qa_chain():
             allow_dangerous_deserialization=True
         )
 
-        llm = ChatOpenAI(model="gpt-4o-mini")
+        llm = ChatOpenAI(
+        model="gpt-4o-mini",
+        api_key=OPENAI_API_KEY
+        )
 
         qa_chain = RetrievalQA.from_chain_type(
             llm=llm,
