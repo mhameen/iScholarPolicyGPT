@@ -1,20 +1,9 @@
-from langchain_openai import OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_text_splitters import CharacterTextSplitter
-from langchain_community.document_loaders import PyPDFLoader , DirectoryLoader
-import os
-from dotenv import load_dotenv
-load_dotenv()
+from langchain_community.document_loaders import PyPDFLoader, DirectoryLoader
 
-if os.environ.get("OPENAI_API_KEY"):
-    print("OPENAI_API_KEY is set")
-else:
-    raise ValueError("OPENAI_API_KEY is not set")
-
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-
-# Load your documents
+# ✅ Load documents
 loader = DirectoryLoader(
     "./IKSPL_Emp_Policies",
     glob="**/*.pdf",
@@ -22,17 +11,19 @@ loader = DirectoryLoader(
 )
 documents = loader.load()
 
-# Split
+# ✅ Split documents
 text_splitter = CharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
 
-# Use OpenAI embeddings
-embeddings = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
+# ✅ Use HuggingFace embeddings ONLY
+embeddings = HuggingFaceEmbeddings(
+    model_name="all-MiniLM-L6-v2"
+)
 
-# Create FAISS
+# ✅ Create FAISS (ONLY ONCE)
 vectorstore = FAISS.from_documents(docs, embeddings)
 
-# Save
+# ✅ Save FAISS
 vectorstore.save_local("faiss_index")
 
-print("FAISS rebuilt successfully ✅")
+print("FAISS rebuilt correctly ✅")
