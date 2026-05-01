@@ -3,6 +3,8 @@ from pydantic import BaseModel
 import traceback
 from dotenv import load_dotenv
 import os
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_openai import ChatOpenAI
 
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
@@ -34,13 +36,13 @@ def get_qa_chain():
         from langchain_community.vectorstores import FAISS
         from langchain_classic.chains import RetrievalQA
 
-        embeddings = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
+        embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
         vectorstore = FAISS.load_local(
             "faiss_index",
-            embeddings,
-            allow_dangerous_deserialization=True
-        )
+             embeddings,
+             allow_dangerous_deserialization=True
+)
 
         llm = ChatOpenAI(
         model="gpt-4o-mini",
