@@ -83,7 +83,7 @@ def get_qa_chain():
 
         qa_chain = RetrievalQA.from_chain_type(
             llm=llm,
-            retriever=vectorstore.as_retriever(search_kwargs={"k": 1}),
+            retriever=vectorstore.as_retriever(search_kwargs={"k": 5}),
             return_source_documents=True
         )
 
