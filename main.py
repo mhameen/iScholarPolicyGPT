@@ -42,8 +42,14 @@ def get_qa_chain():
             model_name="all-MiniLM-L6-v2"
         )
 
+        # ✅ 🔥 FIX: Absolute path (Railway compatible)
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        faiss_path = os.path.join(BASE_DIR, "faiss_index")
+
+        print("FAISS PATH:", faiss_path)
+
         vectorstore = FAISS.load_local(
-            "faiss_index",
+            faiss_path,
             embeddings,
             allow_dangerous_deserialization=True
         )
